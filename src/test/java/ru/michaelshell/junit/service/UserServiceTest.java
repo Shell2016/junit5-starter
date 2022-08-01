@@ -3,11 +3,15 @@ package ru.michaelshell.junit.service;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import ru.michaelshell.junit.dto.User;
 import ru.michaelshell.junit.paramresolver.UserServiceParamResolver;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,5 +129,25 @@ class UserServiceTest {
             );
 
         }
+
+        @ParameterizedTest
+        @MethodSource("ru.michaelshell.junit.service.UserServiceTest#getArgumentsForLoginTest")
+        void loginParameterizedTest(String username, String password, Optional<User> user) {
+            userService.add(IVAN, LENA);
+
+            var optionalUser = userService.login(username, password);
+            assertThat(optionalUser).isEqualTo(user);
+        }
+
+    }
+
+    static Stream<Arguments> getArgumentsForLoginTest() {
+        return Stream.of(
+                Arguments.of("Ivan", "123", Optional.of(IVAN)),
+                Arguments.of("Lena", "1234", Optional.of(LENA)),
+                Arguments.of("dummy", "123", Optional.empty()),
+                Arguments.of("Ivan", "dummy", Optional.empty())
+        );
+
     }
 }
