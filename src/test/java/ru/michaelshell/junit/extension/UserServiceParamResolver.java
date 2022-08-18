@@ -1,4 +1,4 @@
-package ru.michaelshell.junit.paramresolver;
+package ru.michaelshell.junit.extension;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;

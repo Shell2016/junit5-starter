@@ -7,9 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.michaelshell.junit.dto.User;
-import ru.michaelshell.junit.paramresolver.UserServiceParamResolver;
+import ru.michaelshell.junit.extension.*;
 
-import java.lang.reflect.Executable;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+        GlobalExtension.class,
+        PostProcessingExtension.class,
+        ConditionalExtension.class,
+        ThroableExtension.class
 })
 class UserServiceTest {
 
@@ -125,7 +129,10 @@ class UserServiceTest {
         }
 
         @Test
-        void loginFailureIfWrongName() {
+        void loginFailureIfWrongName() throws IOException {
+            if (true) {
+                throw new RuntimeException();
+            }
             userService.add(IVAN);
             Optional<User> mayBeUser = userService.login("dummy", IVAN.getPassword());
 
