@@ -9,8 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import ru.michaelshell.junit.dto.User;
 import ru.michaelshell.junit.paramresolver.UserServiceParamResolver;
 
+import java.lang.reflect.Executable;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,9 +94,10 @@ class UserServiceTest {
     @Tag("login")
     @Nested
     @DisplayName("Test user login functionality")
+    @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
     class LoginTest {
 
-        @Test
+        @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
         void loginSuccessIfUserExists() {
             userService.add(IVAN);
             Optional<User> mayBeUser = userService.login(IVAN.getName(), IVAN.getPassword());
@@ -103,11 +107,21 @@ class UserServiceTest {
         }
 
         @Test
+        @Disabled("flaky, need to see")
         void loginFailureIfWrongPassword() {
             userService.add(IVAN);
             Optional<User> mayBeUser = userService.login(IVAN.getName(), "dummy");
 
             assertThat(mayBeUser).isEmpty();
+        }
+
+        @Test
+        void checkLoginPerformance() {
+            var result = assertTimeout(Duration.ofMillis(200L), () -> {
+                Thread.sleep(100L);
+                return userService.login(IVAN.getName(), "dummy");
+            });
+
         }
 
         @Test
