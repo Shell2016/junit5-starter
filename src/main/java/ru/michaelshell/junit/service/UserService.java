@@ -1,5 +1,6 @@
 package ru.michaelshell.junit.service;
 
+import ru.michaelshell.junit.dao.UserDao;
 import ru.michaelshell.junit.dto.User;
 
 
@@ -11,6 +12,15 @@ import static java.util.stream.Collectors.toMap;
 public class UserService {
 
     private final List<User> users = new ArrayList<>();
+    private final UserDao userDao;
+
+    public UserService(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public boolean delete(Integer userId) {
+        return userDao.delete(userId);
+    }
 
     public List<User> findAll() {
         return users;
